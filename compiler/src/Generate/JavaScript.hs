@@ -504,10 +504,11 @@ generateManagerHelp home effectsType =
 toMainExports :: Mode.Mode -> Mains -> B.Builder
 toMainExports mode mains =
   let
-    export = JsName.fromKernel Name.platform "export"
+    -- export = JsName.fromKernel Name.platform "export"
     exports = generateExports mode (Map.foldrWithKey addToTrie emptyTrie mains)
   in
-  JsName.toBuilder export <> "(" <> exports <> ");"
+  -- JsName.toBuilder export <> "(" <> exports <> ");"
+    "module.exports = (" <> exports <> ");"
 
 
 generateExports :: Mode.Mode -> Trie -> B.Builder
@@ -516,22 +517,30 @@ generateExports mode (Trie maybeMain subs) =
     starter end =
       case maybeMain of
         Nothing ->
-          "{"
+          -- "{"
+
+          ""
 
         Just (home, main) ->
-          "{'init':"
-          <> JS.exprToBuilder (Expr.generateMain mode home main)
-          <> end
+          -- "{'init':"
+          -- <> JS.exprToBuilder (Expr.generateMain mode home main)
+          -- <> end
+
+          JS.exprToBuilder (Expr.generateMain mode home main)
     in
     case Map.toList subs of
       [] ->
-        starter "" <> "}"
+        -- starter "" <> "}"
+
+        starter ""
 
       (name, subTrie) : otherSubTries ->
-        starter "," <>
-        "'" <> Utf8.toBuilder name <> "':"
-        <> generateExports mode subTrie
-        <> List.foldl' (addSubTrie mode) "}" otherSubTries
+        -- starter "," <>
+        -- "'" <> Utf8.toBuilder name <> "':"
+        -- <> generateExports mode subTrie
+        -- <> List.foldl' (addSubTrie mode) "}" otherSubTries
+
+        generateExports mode subTrie <> List.foldl' (addSubTrie mode) "" otherSubTries
 
 
 addSubTrie :: Mode.Mode -> B.Builder -> (Name.Name, Trie) -> B.Builder

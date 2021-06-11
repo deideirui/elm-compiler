@@ -248,28 +248,30 @@ addDefHelp region annotations home name args body graph@(Opt.LocalGraph _ nodes 
     Result.ok (addDefNode home name args body Set.empty graph)
   else
     let
-      (Can.Forall _ tipe) = annotations ! name
+      -- (Can.Forall _ tipe) = annotations ! name
 
       addMain (deps, fields, main) =
         addDefNode home name args body deps $
           Opt.LocalGraph (Just main) nodes (Map.unionWith (+) fields fieldCounts)
     in
-    case Type.deepDealias tipe of
-      Can.TType hm nm [_] | hm == ModuleName.virtualDom && nm == Name.node ->
-          Result.ok $ addMain $ Names.run $
-            Names.registerKernel Name.virtualDom Opt.Static
+    -- case Type.deepDealias tipe of
+      -- Can.TType hm nm [_] | hm == ModuleName.virtualDom && nm == Name.node ->
+      --     Result.ok $ addMain $ Names.run $
+      --       Names.registerKernel Name.virtualDom Opt.Static
 
-      Can.TType hm nm [flags, _, message] | hm == ModuleName.platform && nm == Name.program ->
-          case Effects.checkPayload flags of
-            Right () ->
-              Result.ok $ addMain $ Names.run $
-                Opt.Dynamic message <$> Port.toFlagsDecoder flags
+      -- Can.TType hm nm [flags, _, message] | hm == ModuleName.platform && nm == Name.program ->
+      --     case Effects.checkPayload flags of
+      --       Right () ->
+      --         Result.ok $ addMain $ Names.run $
+      --           Opt.Dynamic message <$> Port.toFlagsDecoder flags
 
-            Left (subType, invalidPayload) ->
-              Result.throw (E.BadFlags region subType invalidPayload)
+      --       Left (subType, invalidPayload) ->
+      --         Result.throw (E.BadFlags region subType invalidPayload)
 
-      _ ->
-          Result.throw (E.BadType region tipe)
+      -- _ ->
+      --     Result.throw (E.BadType region tipe)
+      Result.ok $ addMain $ Names.run $
+        Names.registerField Name._main Opt.Static
 
 
 addDefNode :: ModuleName.Canonical -> Name.Name -> [Can.Pattern] -> Can.Expr -> Set.Set Opt.Global -> Opt.LocalGraph -> Opt.LocalGraph

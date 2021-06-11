@@ -104,13 +104,17 @@ runHelp root paths style (Flags debug optimize maybeOutput _ maybeDocs) =
                   return ()
 
                 Just (JS target) ->
-                  case getNoMains artifacts of
-                    [] ->
-                      do  builder <- toBuilder root details desiredMode artifacts
-                          generate style target builder (Build.getRootNames artifacts)
+                  -- case getNoMains artifacts of
+                    -- [] ->
+                    --   do  builder <- toBuilder root details desiredMode artifacts
+                    --       generate style target builder (Build.getRootNames artifacts)
 
-                    name:names ->
-                      Task.throw (Exit.MakeNonMainFilesIntoJavaScript name names)
+                    -- name:names ->
+                    --   Task.throw (Exit.MakeNonMainFilesIntoJavaScript name names)
+
+                    do
+                      builder <- toBuilder root details desiredMode artifacts
+                      generate style target builder (Build.getRootNames artifacts)
 
                 Just (Html target) ->
                   do  name <- hasOneMain artifacts
